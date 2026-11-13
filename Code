@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Seven Segment Display</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                135deg,
+                #000428,
+                #004e92
+            );
+
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: #101820;
+            padding: 40px 25px;
+            border-radius: 20px;
+            text-align: center;
+
+            box-shadow: 0 0 30px rgba(0,0,0,0.6);
+            border: 2px solid #263746;
+        }
+
+        h1 {
+            color: #00eaff;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 35px;
+        }
+
+        .display {
+            min-height: 150px;
+            background: #050505;
+            border-radius: 15px;
+            padding: 25px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+
+            box-shadow: inset 0 0 20px #222;
+            border: 2px solid #333;
+        }
+
+        .digit {
+            position: relative;
+            width: 65px;
+            height: 120px;
+        }
+
+        .segment {
+            position: absolute;
+            background: #321010;
+            border-radius: 8px;
+            opacity: 0.3;
+            transition: 0.2s;
+        }
+
+        /* Horizontal segments */
+
+        .a, .g, .d {
+            width: 40px;
+            height: 9px;
+            left: 12px;
+            clip-path: polygon(
+                15% 0,
+                85% 0,
+                100% 50%,
+                85% 100%,
+                15% 100%,
+                0 50%
+            );
+        }
+
+        .a {
+            top: 0;
+        }
+
+        .g {
+            top: 55px;
+        }
+
+        .d {
+            bottom: 0;
+        }
+
+        /* Vertical segments */
+
+        .b, .c, .e, .f {
+            width: 9px;
+            height: 45px;
+            clip-path: polygon(
+                50% 0,
+                100% 12%,
+                100% 88%,
+                50% 100%,
+                0 88%,
+                0 12%
+            );
+        }
+
+        .b {
+            top: 5px;
+            right: 4px;
+        }
+
+        .c {
+            bottom: 5px;
+            right: 4px;
+        }
+
+        .e {
+            bottom: 5px;
+            left: 4px;
+        }
+
+        .f {
+            top: 5px;
+            left: 4px;
+        }
+
+        /* Active LED segments */
+
+        .segment.active {
+            background: #ff2525;
+            opacity: 1;
+
+            box-shadow:
+                0 0 8px #ff0000,
+                0 0 18px #ff0000,
+                0 0 30px #ff3333;
+        }
+
+        .input-section {
+            margin-top: 30px;
+        }
+
+        input {
+            width: 100%;
+            max-width: 350px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #00eaff;
+            background: #18232d;
+            color: white;
+            font-size: 18px;
+            outline: none;
+            text-align: center;
+        }
+
+        button {
+            padding: 13px 25px;
+            margin: 15px 5px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .show-btn {
+            background: #00c9ff;
+            color: #00131c;
+        }
+
+        .clear-btn {
+            background: #ff3333;
+            color: white;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            opacity: 0.85;
+        }
+
+        .message {
+            color: #00eaff;
+            margin-top: 20px;
+            min-height: 22px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        @media(max-width: 450px) {
+
+            .container {
+                padding: 25px 12px;
+            }
+
+            .digit {
+                transform: scale(0.8);
+                margin: -10px;
+            }
+
+            .display {
+                gap: 3px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>SEVEN SEGMENT DISPLAY</h1>
+
+        <p class="subtitle">
+            Enter a number to see the LED display
+        </p>
+
+        <!-- Seven Segment Display -->
+
+        <div class="display" id="display">
+
+        </div>
+
+        <!-- Input Section -->
+
+        <div class="input-section">
+
+            <input
+                type="text"
+                id="numberInput"
+                placeholder="Enter numbers (0-9)"
+                maxlength="8"
+                inputmode="numeric"
+            >
+
+            <br>
+
+            <button
+                class="show-btn"
+                onclick="showNumber()"
+            >
+                Display Number
+            </button>
+
+            <button
+                class="clear-btn"
+                onclick="clearDisplay()"
+            >
+                Clear
+            </button>
+
+        </div>
+
+        <p class="message" id="message">
+            Ready to display numbers!
+        </p>
+
+        <div class="footer">
+            DIGITAL LED TECHNOLOGY
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // Seven segment patterns
+        // a, b, c, d, e, f, g
+
+        const patterns = {
+
+            0: ["a", "b", "c", "d", "e", "f"],
+
+            1: ["b", "c"],
+
+            2: ["a", "b", "g", "e", "d"],
+
+            3: ["a", "b", "c", "d", "g"],
+
+            4: ["f", "g", "b", "c"],
+
+            5: ["a", "f", "g", "c", "d"],
+
+            6: ["a", "f", "g", "e", "c", "d"],
+
+            7: ["a", "b", "c"],
+
+            8: ["a", "b", "c", "d", "e", "f", "g"],
+
+            9: ["a", "b", "c", "d", "f", "g"]
+
+        };
+
+
+        // Create a single digit display
+
+        function createDigit(number) {
+
+            const digit = document.createElement("div");
+
+            digit.className = "digit";
+
+            const segments = [
+                "a", "b", "c", "d",
+                "e", "f", "g"
+            ];
+
+            segments.forEach(function(segmentName) {
+
+                const segment = document.createElement("div");
+
+                segment.className = "segment " + segmentName;
+
+                // Activate required segments
+
+                if (patterns[number].includes(segmentName)) {
+
+                    segment.classList.add("active");
+
+                }
+
+                digit.appendChild(segment);
+
+            });
+
+            return digit;
+
+        }
+
+
+        // Display entered number
+
+        function showNumber() {
+
+            const input = document.getElementById("numberInput");
+
+            const number = input.value.trim();
+
+            const display = document.getElementById("display");
+
+            const message = document.getElementById("message");
+
+            // Validate input
+
+            if (number === "" || !/^\d{1,8}$/.test(number)) {
+
+                message.textContent =
+                    "Please enter 1 to 8 digits (0-9)!";
+
+                return;
+
+            }
+
+            // Clear previous display
+
+            display.innerHTML = "";
+
+            // Display each digit
+
+            for (let digit of number) {
+
+                const digitElement = createDigit(digit);
+
+                display.appendChild(digitElement);
+
+            }
+
+            message.textContent =
+                "Number displayed successfully!";
+
+        }
+
+
+        // Clear the display
+
+        function clearDisplay() {
+
+            document.getElementById("display").innerHTML = "";
+
+            document.getElementById("numberInput").value = "";
+
+            document.getElementById("message").textContent =
+                "Display cleared!";
+
+        }
+
+
+        // Allow Enter key to display number
+
+        document.getElementById("numberInput")
+            .addEventListener("keydown", function(event) {
+
+                if (event.key === "Enter") {
+
+                    showNumber();
+
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>
